@@ -11,9 +11,12 @@ services:
     networks:
       - proxy
       - dbs
+      - automation
 
 networks:
   proxy:
     external: true
   dbs:
+    external: true
+  automation:
     external: true
