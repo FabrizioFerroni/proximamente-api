@@ -10,7 +10,10 @@ services:
     restart: unless-stopped
     networks:
       - proxy
+      - dbs
 
 networks:
   proxy:
+    external: true
+  dbs:
     external: true
