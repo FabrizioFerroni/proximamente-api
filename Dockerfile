@@ -1,26 +1,36 @@
-# Base image
+# ---------- Stage 1: Build ----------
+FROM node:lts-alpine as builder
+
+# Set workdir
+WORKDIR /usr/src/app
+
+# Copiar solo lo necesario para instalar y compilar
+COPY package*.json ./
+RUN npm clean-install
+
+# Copiar el resto del código fuente
+COPY . .
+
+# Compilar TypeScript
+RUN npm run build
+
+# ---------- Stage 2: Production ----------
 FROM node:lts-alpine
 
 # Set environment variables
 ENV NODE_ENV=production \
-    TZ=America/Argentina/Cordoba
+    TZ=America/Argentina/Buenos_Aires
 
-# Create app directory
+# Crear directorio de trabajo
 WORKDIR /usr/src/app
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+# Copiar solo lo necesario desde el build
+COPY --from=builder /usr/src/app/dist ./
+COPY --from=builder /usr/src/app/package*.json ./
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
-# Install app dependencies
-RUN npm install
-
-RUN npm run build
-
-# Bundle app source
-COPY dist/ .
-
-# Start the server using the production build
-CMD [ "node", "app.js" ]
-
-# Exposing server port
+# Exponer puerto
 EXPOSE 3000
+
+# Comando de inicio
+CMD ["node", "app.js"]
