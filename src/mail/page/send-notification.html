@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <title>Gracias por suscribirte - Fabrii Dev</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <meta http-equiv="List-Unsubscribe" content="<mailto:hola@fabriziodev.tech>, <%= unsubscribeUrl %>">
+    <style>
+  @media only screen and (max-width: 600px) {
+    .inner-body {
+      width: 100% !important;
+    }
+    .footer {
+      width: 100% !important;
+    }
+  }
+
+  .social-icon {
+    height: 16px;
+    width: 16px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  
+  .social-link {  
+    background-color: #eae9e9;
+    color:rgba(0, 0, 0, 0.85);
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    padding: 10px;
+    border-radius: 5%;
+  }
+
+  .social-link:hover {
+    background-color: #b02b2b;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5%;
+  }
+
+  .social-block {
+    margin-top: 16px;
+  }
+
+  .social-link {
+  position: relative;
+}
+
+.social-link::after {
+  content: attr(data-tooltip);
+  background-color: #3d4852;
+  color: #b0adc5;
+  padding: 5px;
+  font-size: 10px;
+  border-radius: 5px;
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  width: max-content;
+}
+
+.social-link:hover::after {
+  opacity: 1;
+}
+
+.wrapper-tbl {
+  background-color: #edf2f7;
+}
+
+.body{
+    background-color: #edf2f7;
+}
+
+.heading-text{
+    color: #3d4852;
+}
+
+.footer-text{
+    color: #b0adc5;
+}
+
+
+@media (prefers-color-scheme: dark) {
+    body {
+    background-color: #1a202c !important;
+  }
+
+  .body{
+    background-color: #1a202c !important;
+  }
+
+  .wrapper-tbl {
+    background-color: #1a202c !important;
+  }
+
+  .heading-text{
+    color: #7f8081;
+  }
+
+  body {
+    background-color: #1a202c !important;
+    color: #7f8081 !important;
+  }
+
+  .inner-body {
+    background-color: #2d3748 !important;
+  }
+
+  .content-cell,
+  .footer {
+    color: #7f8081 !important;
+  }
+
+  .social-link {
+    background-color: #4a5568 !important;
+    color: #7f8081 !important;
+  }
+
+  .social-link:hover {
+    background-color: #b02b2b !important;
+    color: #7f8081 !important;
+  }
+
+  .social-link::after {
+    background-color: #7f8081 !important;
+    color: #1a202c !important;
+  }
+
+  .footer-text{
+    color: #7f8081 !important;
+  }
+}
+
+
+</style>
+  </head>
+
+  <body
+    style="
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol';
+      background-color: #edf2f7;
+      color: #718096;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      width: 100% !important;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      role="presentation"
+      class="wrapper-tbl"
+      style="background-color: #edf2f7; margin: 0; padding: 0; width: 100%"
+    >
+      <tr>
+        <td align="center">
+          <table
+            class="content"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            style="width: 100%"
+          >
+            <tr>
+              <td class="header" style="padding: 25px 0; text-align: center">
+                <a
+                  href="<%= urlApp %>"
+                  style="
+                    color: #3d4852;
+                    font-size: 19px;
+                    font-weight: bold;
+                    text-decoration: none;
+                  "
+                  target="_blank"
+                >
+                <!-- https://res.cloudinary.com/dwyyc6ndz/image/upload/v1734046253/numaferre/fwgg3s78gdvdrmiuvwip.png -->
+                  <img
+                    src="https://res.cloudinary.com/fabrizio-dev/image/upload/v1752635104/fabrizio-dev/logov8_du2iet.png"
+                    alt="Logo Fabrizio Developer"
+                    style="height: auto; width: 300px; border: none"
+                  />
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                class="body"
+                style="
+                  border: hidden !important;
+                  width: 100%;
+                "
+              >
+                <table
+                  class="inner-body"
+                  align="center"
+                  width="570"
+                  cellpadding="0"
+                  cellspacing="0"
+                  role="presentation"
+                  style="
+                    background-color: #ffffff;
+                    border-radius: 2px;
+                    box-shadow: 0 2px 0 rgba(0, 0, 150, 0.025),
+                      2px 4px 0 rgba(0, 0, 150, 0.015);
+                    margin: 0 auto;
+                    width: 570px;
+                  "
+                >
+                  <tr>
+                    <td class="content-cell" style="padding: 32px">
+                      <h1
+                        class="heading-text"
+                        style="
+                          
+                          font-size: 22px;
+                          font-weight: bold;
+                          margin-top: 0;
+                          text-align: left;
+                        "
+                      >
+                        ¡Gracias por suscribirte, <strong><%= name %></strong>!
+                      </h1>
+
+                      <p
+                        style="
+                          font-size: 16px;
+                          line-height: 1.5em;
+                          text-align: left;
+                        "
+                      >
+                        Te avisaré por este medio cuando mi portfolio esté
+                        disponible en línea. ¡Estoy trabajando para que quede
+                        genial!
+                      </p>
+
+                      <p
+                        style="
+                          font-size: 16px;
+                          line-height: 1.5em;
+                          text-align: left;
+                        "
+                      >
+                        Si tenés alguna consulta o querés escribirme, podés
+                        hacerlo a este correo:
+                        <a
+                          href="mailto:<%= mailinfo %>"
+                          style="color: #3869d4; text-decoration: none"
+                          ><%= mailinfo %></a
+                        >.
+                      </p>
+
+                      <p
+                        style="
+                          font-size: 16px;
+                          line-height: 1.5em;
+                          text-align: left;
+                        "
+                      >
+                        ¡Un saludo!<br />
+                        <strong>Fabrizio</strong>
+                      </p>
+
+                      <table
+                        class="subcopy"
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        role="presentation"
+                        style="
+                          border-top: 1px solid #e8e5ef;
+                          margin-top: 5px;
+                          padding-top: 5px;
+                        "
+                      >
+                        <tr>
+                          <td>
+                            <p
+                              style="
+                                font-size: 14px;
+                                line-height: 1.5em;
+                                text-align: center;
+                              "
+                            >
+                              También podés encontrarme en:<br />
+                              <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 12px">
+                                <a
+                                href="<%= githubUrl %>"
+                                target="_blank"
+                                class="social-link"
+                                data-tooltip="Ir a mi perfil de Github"
+                              >
+                                <img
+                                  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                                  alt="GitHub"
+                                  class="social-icon"
+                                />
+                                GitHub
+                              </a>
+                              <a
+                                href="<%= linkedinUrl %>"
+                                target="_blank"
+                                class="social-link"
+                                data-tooltip="Ir a mi perfil de LinkedIn"
+                              >
+                                <img
+                                  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
+                                  alt="LinkedIn"
+                                  class="social-icon"
+                                />
+                                LinkedIn
+                              </a>
+                              <a
+                                href="mailto:<%= mailinfo %>"
+                                target="_blank"
+                                class="social-link"
+                                data-tooltip="Contactarme a mi email"
+                              >
+                                <img
+                                  src="https://cdn-icons-png.flaticon.com/512/561/561127.png"
+                                  alt="Email"
+                                  class="social-icon"
+                                />
+                                Email
+                              </a>
+                              </div>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <table
+                  class="footer"
+                  align="center"
+                  width="570"
+                  cellpadding="0"
+                  cellspacing="0"
+                >
+                  <tr>
+                    <td
+                      class="content-cell"
+                      align="center"
+                      style="padding: 32px"
+                    >
+                      <p
+                      class="footer-text"
+                        style="
+                          font-size: 12px;
+                          color: #b0adc5;
+                          text-align: center;
+                        "
+                      >
+                        © 2025 - <%= year %> <strong>Fabrizio Developer</strong>. Todos
+                        los derechos reservados.
+                      </p>
+                      <p
+                      class="footer-text"
+                        style="
+                          font-size: 12px;
+                          color: #b0adc5;
+                          text-align: center;
+                        "
+                      >
+                        Recibiste este mensaje porque te suscribiste para recibir novedades sobre mi portfolio.<br />
+  Si querés desuscribirte, hacelo desde
+  <a
+    href="<%= unsubscribeUrl %>"
+    style="color: #3869d4; text-decoration: none"
+    target="_blank"
+  >
+    este enlace
+  </a>.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

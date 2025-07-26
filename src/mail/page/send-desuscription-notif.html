@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <title>Te desuscribiste - Fabrii Dev</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background-color: #edf2f7;
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+        color: #718096;
+      }
+
+      .wrapper {
+        background-color: #edf2f7;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .content {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        border-radius: 8px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      h1 {
+        color: #3d4852;
+        font-size: 22px;
+        margin-bottom: 16px;
+      }
+
+      p {
+        font-size: 16px;
+        line-height: 1.5em;
+        margin-bottom: 16px;
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 12px;
+        color: #b0adc5;
+        padding: 32px;
+      }
+
+      .social-link {
+        background-color: #eae9e9;
+        color: rgba(0, 0, 0, 0.85);
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+        padding: 10px;
+        border-radius: 5%;
+      }
+
+      .social-link:hover {
+        background-color: #b02b2b;
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 5%;
+      }
+
+      .social-icons {
+        text-align: center;
+        margin-top: 24px;
+      }
+
+      .social-icons a {
+        display: inline-block;
+        margin: 0 8px;
+        transition: transform 0.2s ease;
+      }
+
+      .social-icons a:hover {
+        transform: scale(1.15);
+      }
+
+      .social-icons img {
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+      }
+
+      .social-link {
+        position: relative;
+      }
+
+      .social-link::after {
+        content: attr(data-tooltip);
+        background-color: #3d4852;
+        color: #b0adc5;
+        padding: 5px;
+        font-size: 10px;
+        border-radius: 5px;
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        width: max-content;
+      }
+
+      .social-link:hover::after {
+        opacity: 1;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #1a202c !important;
+          color: #7f8081 !important;
+        }
+
+        .wrapper {
+          background-color: #1a202c !important;
+        }
+
+        .content {
+          background-color: #2d3748 !important;
+          color: #7f8081 !important;
+        }
+
+        .footer {
+          color: #7f8081 !important;
+        }
+
+        .social-link {
+          background-color: #4a5568 !important;
+          color: #7f8081 !important;
+        }
+
+        .social-link:hover {
+          background-color: #b02b2b !important;
+          color: #7f8081 !important;
+        }
+
+        .social-link::after {
+          background-color: #7f8081 !important;
+          color: #1a202c !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div style="text-align: center; padding: 25px 0">
+        <a href="<%= urlApp %>" target="_blank">
+          <img
+            src="https://res.cloudinary.com/fabrizio-dev/image/upload/v1752635104/fabrizio-dev/logov8_du2iet.png"
+            alt="Logo Fabrizio Developer"
+            style="height: auto; width: 250px; border: none"
+          />
+        </a>
+      </div>
+      <div class="content">
+        <h1>Lamentamos verte partir, <strong><%= name %></strong>...</h1>
+        <p>
+          Tu dirección de correo ha sido correctamente desuscripta de la lista.
+          Ya no recibirás más novedades sobre mi portfolio.
+        </p>
+        <p>
+          Lamento haberte molestado. Si el contenido no era lo que esperabas o
+          simplemente querés contarme el motivo de tu baja, estaré agradecido de
+          recibir tus comentarios en
+          <a
+            href="mailto:<%= mailinfo %>"
+            style="color: #3869d4; text-decoration: none"
+            ><%= mailinfo %></a
+          >.
+        </p>
+        <p>
+          ¡Gracias por tu tiempo y haber formado parte de este proyecto!<br />
+          <strong>Fabrizio</strong>
+        </p>
+
+        <div class="social-icons">
+          <p style="font-size: 14px; margin-bottom: 8px">
+            También me podés encontrar en:
+          </p>
+          <a
+            href="<%= githubUrl %>"
+            target="_blank"
+            class="social-link"
+            data-tooltip="Ir a mi perfil de Github"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+              alt="GitHub"
+            />
+            GitHub
+          </a>
+          <a
+            href="<%= linkedinUrl %>"
+            target="_blank"
+            data-tooltip="Ir a mi perfil de LinkedIn"
+            class="social-link"
+          >
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/174/174857.png"
+              alt="LinkedIn"
+            />
+            LinkedIn
+          </a>
+          <a
+            href="mailto:<%= mailinfo %>"
+            target="_blank"
+            data-tooltip="Contactarme a mi email"
+            class="social-link"
+          >
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/732/732200.png"
+              alt="Email"
+            />
+            Email
+          </a>
+        </div>
+      </div>
+
+      <div class="footer">
+        © 2025 - <%= year %> Fabrizio Dev. Todos los derechos reservados.
+      </div>
+    </div>
+  </body>
+</html>
