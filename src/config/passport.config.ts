@@ -51,7 +51,6 @@ passport.use(
   )
 );
 
-// 2. ESTRATEGIA JWT: Para proteger rutas
 passport.use(
   new JwtStrategy(
     {

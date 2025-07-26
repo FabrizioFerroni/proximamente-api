@@ -24,9 +24,6 @@ const { API_PORT, NODE_ENV: entorno } = process.env;
 const app = express();
 const port = API_PORT || 3000;
 
-const corsOptions = {
-  origin: "*",
-};
 app.use(useragent.express());
 
 app.use(passport.initialize());
@@ -34,6 +31,20 @@ app.use(passport.initialize());
 const proxy = process.env.TRUST_PROXY === "true" ? true : false;
 
 app.set("trust proxy", proxy || true);
+
+const allowedOrigins = process.env.HOST_FRONT!.split(",");
+
+const corsOptions = {
+  origin: (origin: any, callback: any) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("No permitido por CORS"));
+    }
+  },
+  credentials: true, // si usás cookies o auth headers
+};
 
 app.use(cors(corsOptions));
 
@@ -48,6 +59,8 @@ const sixtyDaysInSeconds = 5184000;
 app.use(
   helmet.hsts({
     maxAge: sixtyDaysInSeconds,
+    includeSubDomains: true,
+    preload: true,
   })
 );
 // Sets "X-Content-Type-Options: nosniff".

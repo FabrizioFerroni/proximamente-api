@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 config();
 
-const VALID_API_KEYS = [process.env.API_KEY]; // o una lista si necesitás varias
+const VALID_API_KEYS = [process.env.API_KEY];
 
 export function apiKeyAuth(
   req: Request,

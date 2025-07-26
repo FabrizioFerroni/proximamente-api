@@ -132,16 +132,16 @@ export class UserRepository {
     } = data;
 
     const query = SQL`
-    UPDATE usuarios
-    SET name = ${name},
-        lastname = ${lastname},
-        username = ${username},
-        password = ${password},
-        is_2fa_enabled = ${is_2fa_enabled},
-        twofa_secret = ${twofa_secret},
-        twofa_temp_secret = ${twofa_temp_secret},
-        login_secret = ${login_secret}
-    WHERE id = ${id};
+    UPDATE usuarios AS u
+    SET u.name = ${name},
+        u.lastname = ${lastname},
+        u.username = ${username},
+        u.password = ${password},
+        u.is_2fa_enabled = ${is_2fa_enabled},
+        u.twofa_secret = ${twofa_secret},
+        u.twofa_temp_secret = ${twofa_temp_secret},
+        u.login_secret = ${login_secret}
+    WHERE u.id = ${id};
     `;
 
     const [result] = (await pool.query(query)) as any as [

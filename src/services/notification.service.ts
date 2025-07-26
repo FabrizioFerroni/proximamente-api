@@ -125,7 +125,6 @@ export class NotificationService {
             "DD-MM-YYYY HH:mm:ss"
           )}).`
         );
-        // throw new BadRequestException("Token inválido o modificado.");
       }
 
       const data: UpdateNotificationDto = {
@@ -338,7 +337,7 @@ export class NotificationService {
   async sendAllNotificationAuto(): Promise<unknown> {
     try {
       const body = {
-        url: process.env.HOST_FRONTEND ?? "",
+        url: process.env.BASE_URL ?? "",
         year: new Date().getFullYear(),
       };
 

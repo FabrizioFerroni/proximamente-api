@@ -9,9 +9,13 @@ import { Logger } from "../common/logger";
 
 config();
 
+const host = process.env.HOST_MAIL ?? "smtp.mailtrap.io";
+const port = process.env.PORT_MAIL ?? "2525";
 const name = process.env.NAME_MAIL;
 const user = process.env.USER_MAIL;
 const pass = process.env.PASS_MAIL;
+const secure = process.env.SECURE_MAIL ?? false;
+const ciphers = process.env.CIPHERS_MAIL ?? "SSLv3";
 const entorno = process.env.NODE_ENV;
 
 export const sendMail = async (
@@ -37,8 +41,8 @@ export const sendMail = async (
   if (entorno === "development") {
     transporter = nodemailer.createTransport(
       smtpTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
+        host: host,
+        port: +port!,
         auth: {
           user: user,
           pass: pass,
@@ -50,15 +54,15 @@ export const sendMail = async (
   if (entorno === "production") {
     transporter = nodemailer.createTransport(
       smtpTransport({
-        host: "smtp-mail.outlook.com",
-        port: 587,
-        secure: false,
+        host: host,
+        port: +port!,
+        secure: secure === "true" ? true : false,
         auth: {
           user: user,
           pass: pass,
         },
         tls: {
-          ciphers: "SSLv3",
+          ciphers: ciphers,
         },
       })
     );
@@ -74,7 +78,7 @@ export const sendMail = async (
 
       let mailOptions = {
         from: `${name} <${user}>`,
-        to: `${nameUser} <${email}>`, //email para quien va enviado
+        to: `${nameUser} <${email}>`,
         subject: subject,
         html: htmlToSend,
       };

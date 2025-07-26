@@ -15,7 +15,6 @@ const validateResult = (req: Request, res: Response, next: NextFunction) => {
       delete cleanedError.msg;
       delete cleanedError.value;
       delete cleanedError.type;
-      //delete cleanedError.location;
       return cleanedError;
     });
     res.status(400).send({ errors: cleanedErrors });

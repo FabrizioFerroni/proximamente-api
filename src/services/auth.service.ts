@@ -438,7 +438,7 @@ export class AuthService {
         oldToken,
         process.env.JWT_REFRESH_SECRET!
       ) as JwtPayload;
-      //TODO: Aca tengo el jti para cerrar la sesion...
+
       const sesionWithJti = await this.sessionRepo.validateJti(decoded.jti!);
 
       if (!sesionWithJti) {

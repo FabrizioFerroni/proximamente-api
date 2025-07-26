@@ -50,8 +50,7 @@ export class NotificationRepository {
             n.created_at 
         FROM notificaciones AS n 
         WHERE n.status = true
-        ORDER BY n.created_at DESC
-        LIMIT 2`;
+        ORDER BY n.created_at DESC`;
 
     const [rows] = await pool.query<RowDataPacket[]>(query);
     return rows as NotificationModel[];
@@ -130,7 +129,7 @@ export class NotificationRepository {
 
   async validateEmail(email: string): Promise<boolean> {
     const query = SQL`
-      SELECT 0 FROM notificaciones AS n WHERE email = ${email}
+      SELECT 0 FROM notificaciones AS n WHERE n.email = ${email}
     `;
     const [rows] = await pool.query<RowDataPacket[]>(query);
     return rows.length > 0;
