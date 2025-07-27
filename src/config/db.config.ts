@@ -31,12 +31,12 @@ async function connectWithRetry(retries = 5, delay = 3000) {
       await conn.ping();
       conn.release();
       logger.info("La conexión a la base de datos se ha establecido con éxito");
-      Logger.log("Conexión exitosa a la base de datos.", "DB Connection");
+      Logger.log("Conexión exitosa a la base de datos.", "DBConnection");
       return;
     } catch (err) {
       Logger.warn(
         `Fallo en la conexión a DB. Reintento ${i + 1}/${retries}...`,
-        "DB Connection"
+        "DBConnection"
       );
       await new Promise((res) => setTimeout(res, delay));
     }
@@ -44,7 +44,7 @@ async function connectWithRetry(retries = 5, delay = 3000) {
 
   Logger.error(
     "No se pudo conectar a la base de datos tras varios intentos.",
-    "DB Connection"
+    "DBConnection"
   );
   process.exit(1);
 }

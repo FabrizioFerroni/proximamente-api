@@ -113,7 +113,7 @@ if (entorno === "development") {
       `El servidor HTTPS se ejecuta en el puerto: ${port} sin problemas. En el entorno de: ${app.get(
         "env"
       )}`,
-      "App Initialization"
+      "AppInitialization"
     );
   });
 } else {
@@ -127,7 +127,7 @@ if (entorno === "development") {
       `El servidor se ejecuta en el puerto: ${port} sin problemas. En el entorno de: ${app.get(
         "env"
       )}`,
-      "App Initialization"
+      "AppInitialization"
     );
   });
 }
