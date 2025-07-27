@@ -1,0 +1,146 @@
+name: NPM DNS Check, Create or Update
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Portainer"]
+    types:
+      - completed
+
+jobs:
+  npm-dns-setup:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login en Nginx Proxy Manager y obtener token
+        id: login
+        run: |
+          RESPONSE=$(curl -s -X POST "${{ secrets.NPM_URL }}/api/tokens" \
+            -H "Content-Type: application/json" \
+            -d "{\"identity\":\"${{ secrets.NPM_EMAIL }}\",\"secret\":\"${{ secrets.NPM_PASSWORD }}\"}")
+
+          TOKEN=$(echo "$RESPONSE" | jq -r '.token')
+          if [ "$TOKEN" == "null" ] || [ -z "$TOKEN" ]; then
+            echo "Error: no se pudo autenticar con NPM"
+            exit 1
+          fi
+
+          echo "token=$TOKEN" >> $GITHUB_ENV
+
+      - name: Obtener ID del usuario por email
+        id: get-user-id
+        run: |
+          USERS=$(curl -s -X GET "${{ secrets.NPM_URL }}/api/users" \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json")
+
+          OWNER_ID=$(echo "$USERS" | jq -r --arg email "${{ secrets.NPM_EMAIL }}" '.[] | select(.email == $email) | .id')
+
+          if [[ -z "$OWNER_ID" ]]; then
+            echo "Error: No se encontró el usuario con email ${{ secrets.NPM_EMAIL }}"
+            exit 1
+          fi
+
+          echo "owner_id=$OWNER_ID" >> $GITHUB_ENV
+
+      - name: Verificar si el dominio ya existe
+        id: check
+        run: |
+          RESPONSE=$(curl -s -X GET "${{ secrets.NPM_URL }}/api/nginx/proxy-hosts" \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json")
+
+          HOST=$(echo "$RESPONSE" | jq -r --arg domain "${{ secrets.DNS_NAME }}" '.[] | select(.domain_names[] == $domain)')
+          HOST_ID=$(echo "$HOST" | jq -r '.id')
+
+          if [[ -n "$HOST_ID" ]]; then
+            echo "exists=true" >> $GITHUB_ENV
+            echo "host_id=$HOST_ID" >> $GITHUB_ENV
+
+            # Comparar datos existentes
+            FORWARD_HOST=$(echo "$HOST" | jq -r '.forward_host')
+            FORWARD_PORT=$(echo "$HOST" | jq -r '.forward_port')
+            CERT_ID=$(echo "$HOST" | jq -r '.certificate_id')
+
+            if [[ "$FORWARD_HOST" == "${{ secrets.FORWARD_HOST }}" && "$FORWARD_PORT" == "${{ secrets.FORWARD_PORT }}" && "$CERT_ID" == "${{ secrets.CERTIFICATE_ID }}" ]]; then
+              echo "needs_update=false" >> $GITHUB_ENV
+            else
+              echo "needs_update=true" >> $GITHUB_ENV
+            fi
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Crear el dominio si no existe
+        if: env.exists == 'false'
+        run: |
+          curl -s -X POST "${{ secrets.NPM_URL }}/api/nginx/proxy-hosts" \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "owner_user_id": '"${{ env.owner_id }}"',
+            "domain_names": ["${{ secrets.DNS_NAME }}"],
+            "forward_host": "${{ secrets.FORWARD_HOST }}",
+            "forward_port": ${{ secrets.FORWARD_PORT }},
+            "access_list_id": 0,
+            "certificate_id": ${{ secrets.CERTIFICATE_ID }},
+            "ssl_forced": true,
+            "caching_enabled": true,
+            "block_exploits": true,
+            "advanced_config": "",
+            "meta": {
+              "letsencrypt_agree": false,
+              "dns_challenge": false,
+              "nginx_online": true,
+              "nginx_err": null
+            },
+            "allow_websocket_upgrade": true,
+            "http2_support": true,
+            "forward_scheme": "http",
+            "enabled": true,
+            "locations": [],
+            "hsts_enabled": true,
+            "hsts_subdomains": false
+          }'
+
+      - name: Actualizar el dominio si ya existe y cambió la config
+        if: env.exists == 'true' && env.needs_update == 'true'
+        run: |
+          curl -s -X PUT "${{ secrets.NPM_URL }}/api/nginx/proxy-hosts/${{ env.host_id }}" \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "owner_user_id": '"${{ env.owner_id }}"',
+            "domain_names": ["${{ secrets.DNS_NAME }}"],
+            "forward_host": "${{ secrets.FORWARD_HOST }}",
+            "forward_port": ${{ secrets.FORWARD_PORT }},
+            "access_list_id": 0,
+            "certificate_id": ${{ secrets.CERTIFICATE_ID }},
+            "ssl_forced": true,
+            "caching_enabled": true,
+            "block_exploits": true,
+            "advanced_config": "",
+            "meta": {
+              "letsencrypt_agree": false,
+              "dns_challenge": false,
+              "nginx_online": true,
+              "nginx_err": null
+            },
+            "allow_websocket_upgrade": true,
+            "http2_support": true,
+            "forward_scheme": "http",
+            "enabled": true,
+            "locations": [],
+            "hsts_enabled": true,
+            "hsts_subdomains": false
+          }'
+
+      - name: Confirmar acción
+        run: |
+          if [[ "${{ env.exists }}" == "false" ]]; then
+            echo "✅ Dominio creado correctamente."
+          elif [[ "${{ env.needs_update }}" == "true" ]]; then
+            echo "♻️ Dominio actualizado con nueva configuración."
+          else
+            echo "✔️ El dominio ya existía y estaba correctamente configurado."
+          fi
