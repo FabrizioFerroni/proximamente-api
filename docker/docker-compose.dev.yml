@@ -56,7 +56,7 @@ services:
       API_KEY: ${API_KEY}
     restart: unless-stopped
     volumes:
-      - /home/ubuntu/certs/proximamente/keys:/keys
+      - /home/ubuntu/certs/proximamente/keys:/usr/src/app/keys
     networks:
       - proxy
       - dbs
