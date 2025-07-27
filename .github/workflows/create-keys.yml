@@ -45,18 +45,24 @@ jobs:
 
             # Generar passphrase solo si no existe .env
             if [ ! -f "$ENV_FILE" ]; then
-              PASSPHRASE=$(openssl rand -base64 32)
-              echo "PASSWORD_PRIVATE_KEY=$PASSPHRASE" > "$ENV_FILE"
-              echo "PATH_PRIVATE_KEY=./keys/private.pem" > "$ENV_FILE"
-              echo "🔑 Passphrase generada y guardada en $ENV_FILE"
+                PASSPHRASE=$(openssl rand -base64 32)
             else
-              echo "🔑 Usando passphrase existente en $ENV_FILE"
-              PASSPHRASE=$(grep PASSWORD_PRIVATE_KEY "$ENV_FILE" | cut -d '=' -f2)
+                echo "🔑 Usando passphrase existente en $ENV_FILE"
+                PASSPHRASE=$(grep PASSWORD_PRIVATE_KEY "$ENV_FILE" | cut -d '=' -f2)
+
+                # Si no está definida, la regeneramos
+                if [ -z "$PASSPHRASE" ]; then
+                    PASSPHRASE=$(openssl rand -base64 32)
+                fi
             fi
 
-            # Generar claves
-            # openssl genpkey -algorithm RSA -aes256 -passout pass:$PASSPHRASE -out "$KEY_DIR/private.pem" -pkeyopt rsa_keygen_bits:2048
-            # openssl rsa -in "$KEY_DIR/private.pem" -passin pass:$PASSPHRASE -pubout -out "$KEY_DIR/public.pem"
+            # Siempre asegurarse de que el .env esté correcto (limpiar y reescribir)
+            grep -v -e '^PASSWORD_PRIVATE_KEY=' -e '^PATH_PRIVATE_KEY=' -e '^PATH_PUBLIC_KEY=' "$ENV_FILE" > "$ENV_FILE.tmp" || true
+            echo "PASSWORD_PRIVATE_KEY=$PASSPHRASE" >> "$ENV_FILE.tmp"
+            echo "PATH_PRIVATE_KEY=/keys/private.pem" >> "$ENV_FILE.tmp"
+            echo "PATH_PUBLIC_KEY=/keys/public.pem" >> "$ENV_FILE.tmp"
+            mv "$ENV_FILE.tmp" "$ENV_FILE"
+
             # Generar claves
             openssl genpkey -algorithm RSA -out "$KEY_DIR/private.pem" -pkeyopt rsa_keygen_bits:2048 -aes-256-cbc -pass pass:$PASSPHRASE
             openssl rsa -in "$KEY_DIR/private.pem" -passin pass:$PASSPHRASE -pubout -out "$KEY_DIR/public.pem"
