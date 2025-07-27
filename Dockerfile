@@ -19,15 +19,18 @@ FROM node:lts-alpine
 
 # Set environment variables
 ENV NODE_ENV=production \
-    TZ=America/Argentina/Buenos_Aires
+    TZ=America/Argentina/Cordoba
 
 # Crear directorio de trabajo
 WORKDIR /usr/src/app
 
 # Copiar solo lo necesario desde el build
 COPY --from=builder /usr/src/app/dist ./
-COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/node_modules ./node_modules
+#COPY --from=builder /usr/src/app/package*.json ./
+
+# mkdir keys
+RUN mkdir keys
 
 # Exponer puerto
 EXPOSE 3000
