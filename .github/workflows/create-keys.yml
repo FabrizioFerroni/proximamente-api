@@ -55,7 +55,10 @@ jobs:
             fi
 
             # Generar claves
-            openssl genpkey -algorithm RSA -aes256 -passout pass:$PASSPHRASE -out "$KEY_DIR/private.pem" -pkeyopt rsa_keygen_bits:2048
+            # openssl genpkey -algorithm RSA -aes256 -passout pass:$PASSPHRASE -out "$KEY_DIR/private.pem" -pkeyopt rsa_keygen_bits:2048
+            # openssl rsa -in "$KEY_DIR/private.pem" -passin pass:$PASSPHRASE -pubout -out "$KEY_DIR/public.pem"
+            # Generar claves
+            openssl genpkey -algorithm RSA -out "$KEY_DIR/private.pem" -pkeyopt rsa_keygen_bits:2048 -aes-256-cbc -pass pass:$PASSPHRASE
             openssl rsa -in "$KEY_DIR/private.pem" -passin pass:$PASSPHRASE -pubout -out "$KEY_DIR/public.pem"
             echo "🔐 Claves generadas correctamente en $KEY_DIR"
           fi
