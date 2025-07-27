@@ -1,0 +1,68 @@
+services:
+  api-proximamente:
+    image: api-proximamente:latest
+    container_name: api-proximamente
+    hostname: api-proximamente
+    environment:
+      APP: ${APP}
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+
+      # Base de datos
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+
+      DOTENV_LOG: ${DOTENV_LOG}
+      DOTENV_KEY: ${DOTENV_KEY}
+      LOG_LEVEL: ${LOG_LEVEL}
+
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+
+      TZ_BD: ${TZ_BD}
+      TZ: ${TZ}
+
+      TRUST_PROXY: ${TRUST_PROXY}
+
+      IP_API_KEY: ${IP_API_KEY}
+      PASSWORD_PRIVATE_KEY: ${PASSWORD_PRIVATE_KEY}
+      PATH_PRIVATE_KEY: ${PATH_PRIVATE_KEY}
+
+      HOST_FRONT: ${HOST_FRONT}
+      HOST_FRONT_EMAIL: ${HOST_FRONT_EMAIL}
+
+      HOST_MAIL: ${HOST_MAIL}
+      PORT_MAIL: ${PORT_MAIL}
+      NAME_MAIL: ${NAME_MAIL}
+      USER_MAIL: ${USER_MAIL}
+      PASS_MAIL: ${PASS_MAIL}
+      SECURE_MAIL: ${SECURE_MAIL}
+      CIPHERS_MAIL: ${CIPHERS_MAIL}
+
+      MAIL_INFO: ${MAIL_INFO}
+      MAIL_CONTACT: ${MAIL_CONTACT}
+
+      BASE_URL: ${BASE_URL}
+      GITHUB_URL: ${GITHUB_URL}
+      LINKEDIN_URL: ${LINKEDIN_URL}
+
+      API_KEY: ${API_KEY}
+    restart: unless-stopped
+    volumes:
+      - /opt/proximamente/keys:/keys:ro
+    networks:
+      - proxy
+      - dbs
+
+networks:
+  proxy:
+    external: true
+  dbs:
+    external: true

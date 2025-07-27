@@ -1,11 +1,13 @@
 import { config } from "dotenv";
-import fs from "fs";
+import fs from "fs/promises";
 import nodemailer from "nodemailer";
 import smtpTransport from "nodemailer-smtp-transport";
 import Handlebars from "handlebars";
 import ejs from "ejs";
 import { logger } from "../utils/winston.logger";
 import { Logger } from "../common/logger";
+import { EnvioCorreosRepository } from "../repositories/envio-correos.repository";
+import { EnviosCorreosDto } from "../dtos/envios-correos.dto";
 
 config();
 
@@ -17,81 +19,125 @@ const pass = process.env.PASS_MAIL;
 const secure = process.env.SECURE_MAIL ?? false;
 const ciphers = process.env.CIPHERS_MAIL ?? "SSLv3";
 const entorno = process.env.NODE_ENV;
+const emailCorreoRepo = new EnvioCorreosRepository();
+const serviceName = "SendMail";
 
 export const sendMail = async (
   nameUser: string,
   email: string,
   subject: string,
   plantilla: string,
-  body: Record<string, string>
-) => {
-  let readHTMLFile = function (path: any, callback: any) {
-    fs.readFile(path, { encoding: "utf-8" }, function (err, html) {
-      if (err) {
-        throw err;
-        callback(err);
-      } else {
-        callback(null, html);
-      }
-    });
-  };
+  body: Record<string, string>,
+  metodo: string
+): Promise<{ success: boolean; message: string; messageId?: string }> => {
+  try {
+    // Leer archivo HTML con fs/promises
+    const html = await fs.readFile(
+      process.cwd() + `/src/mail/page/${plantilla}.html`,
+      "utf-8"
+    );
 
-  let transporter: any = null;
+    const renderedHtml = ejs.render(html, body);
+    const template = Handlebars.compile(renderedHtml);
+    const htmlToSend = template({ op: true });
 
-  if (entorno === "development") {
-    transporter = nodemailer.createTransport(
+    const transporter = nodemailer.createTransport(
       smtpTransport({
-        host: host,
-        port: +port!,
-        auth: {
-          user: user,
-          pass: pass,
-        },
+        host,
+        port: +port,
+        secure: secure === "true",
+        auth: { user, pass },
+        ...(entorno === "production" && {
+          tls: { ciphers },
+        }),
       })
     );
-  }
 
-  if (entorno === "production") {
-    transporter = nodemailer.createTransport(
-      smtpTransport({
-        host: host,
-        port: +port!,
-        secure: secure === "true" ? true : false,
-        auth: {
-          user: user,
-          pass: pass,
-        },
-        tls: {
-          ciphers: ciphers,
-        },
-      })
-    );
-  }
+    const mailOptions = {
+      from: `${name} <${user}>`,
+      to: `${nameUser} <${email}>`,
+      subject,
+      html: htmlToSend,
+    };
 
-  readHTMLFile(
-    process.cwd() + `/src/mail/page/${plantilla}.html`,
-    (err: any, html: any) => {
-      let rest_html = ejs.render(html, body);
+    const info = await transporter.sendMail(mailOptions);
 
-      let template = Handlebars.compile(rest_html);
-      let htmlToSend = template({ op: true });
+    Logger.log(`Email enviado: ${info.response}`, "Mail");
+    logger.info(`Email enviado: ${info.response}`);
 
-      let mailOptions = {
-        from: `${name} <${user}>`,
-        to: `${nameUser} <${email}>`,
-        subject: subject,
-        html: htmlToSend,
-      };
+    const data: EnviosCorreosDto = {
+      success: true,
+      message: "Email enviado",
+      messageId: info.messageId,
+      name: nameUser,
+      email: email,
+      metodo,
+    };
 
-      transporter.sendMail(mailOptions, function (error: any, info: any) {
-        if (error) {
-          logger.error(`${error}`);
-          Logger.error(`${error}`, "Mail");
-          return;
+    const resp = await emailCorreoRepo.saveSendMail(data);
+
+    if (!resp) {
+      Logger.error(
+        `Error al guardar notificación a ${email}: ${info.response}`,
+        serviceName
+      );
+      logger.error(
+        `Error al guardar notificación a ${email}: ${info.response}`,
+        {
+          service: serviceName,
+          stack: info.messageId,
+          metodo: "sendMail",
         }
-        Logger.log(`Email enviado: ${info.response}`, "Mail");
-        logger.info(`Email enviado: ${info.response}`);
-      });
+      );
     }
-  );
+
+    Logger.log(
+      `Envio de notificaciones finalizado y guardado en la BD para ${nameUser} <${email}>`,
+      serviceName
+    );
+
+    return {
+      success: true,
+      message: "Email enviado",
+      messageId: info.messageId,
+    };
+  } catch (error: any) {
+    const errorMsg = `Error al enviar el correo: ${error.message || error}`;
+    logger.error(`${error}`);
+    Logger.error(`${error}`, "Mail");
+
+    const data: EnviosCorreosDto = {
+      success: true,
+      message: errorMsg,
+      name: nameUser,
+      email: email,
+      metodo,
+    };
+
+    const resp = await emailCorreoRepo.saveSendMail(data);
+
+    if (!resp) {
+      Logger.error(
+        `Error al guardar notificación a ${email}: ${error.message}`,
+        serviceName
+      );
+      logger.error(
+        `Error al guardar notificación a ${email}: ${error.message}`,
+        {
+          service: serviceName,
+          stack: error.message,
+          metodo: "sendMail",
+        }
+      );
+    }
+
+    Logger.log(
+      `Envio de notificaciones finalizado y guardado en la BD para ${nameUser} <${email}>`,
+      serviceName
+    );
+    return {
+      success: false,
+      message: errorMsg,
+    };
+  }
 };

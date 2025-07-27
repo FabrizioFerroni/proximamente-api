@@ -24,10 +24,13 @@ import { sendMail } from "../mail/mail.config";
 import { UpdateNotificationDto } from "../dtos/update-notification.dto";
 import dayjs from "dayjs";
 import axios from "axios";
+import { EnvioCorreosRepository } from "../repositories/envio-correos.repository";
+import { EnviosCorreosDto } from "../dtos/envios-correos.dto";
 config();
 
 export class NotificationService {
   private repo = new NotificationRepository();
+  private emailCorreoRepo = new EnvioCorreosRepository();
   private serviceName = NotificationService.name;
   private paginationService = new PaginationService();
 
@@ -65,8 +68,37 @@ export class NotificationService {
         email,
         "Nueva notificación",
         "send-notification",
-        body
+        body,
+        "Registro de una nueva notificación"
       );
+
+      /* const data: EnviosCorreosDto = {
+        success,
+        message,
+        messageId,
+        name: name,
+        email: email,
+        metodo: "Registro de una nueva notificación",
+      };
+
+      const resp = await this.emailCorreoRepo.saveSendMail(data);
+
+      if (!resp) {
+        Logger.error(
+          `Error al guardar notificación a ${email}: ${message}`,
+          this.serviceName
+        );
+        logger.error(`Error al guardar notificación a ${email}: ${message}`, {
+          service: this.serviceName,
+          stack: messageId,
+          metodo: "createNotification",
+        });
+      }
+
+      Logger.log(
+        `Envio de notificaciones finalizado y guardado en la BD para ${name} <${email}>`,
+        this.serviceName
+      ); */
 
       Logger.log(
         `Nueva notificación registrada: ${name} <${email}>`,
@@ -159,7 +191,8 @@ export class NotificationService {
         email,
         "Lo siento, ya no recibirás notificaciones",
         "send-desuscription-notif",
-        body
+        body,
+        "Desactivación de notificaciones"
       );
 
       Logger.log(
@@ -311,6 +344,118 @@ export class NotificationService {
         stack: err.stack,
         metodo: "exportN8N",
       });
+      throw err;
+    }
+  }
+
+  async sendAllNotificationMail(): Promise<{ message: string }> {
+    try {
+      const res: NotificationModel[] = await this.repo.getAll();
+      let interesados = 0;
+      Logger.log(
+        `Enviando notifiaciones por correo a ${res.length} interesados...`,
+        this.serviceName
+      );
+
+      for (let i = 0; i < res.length; i++) {
+        const token = generateTokenDes(
+          res[i].email,
+          new Date(res[i].created_at)
+        );
+
+        const body = {
+          name: res[i].name.split(" ")[0],
+          email: res[i].email,
+          urlApp: process.env.BASE_URL ?? "",
+          githubUrl: process.env.GITHUB_URL ?? "",
+          linkedinUrl: process.env.LINKEDIN_URL ?? "",
+          year: new Date().getFullYear().toString(),
+          mailinfo: process.env.MAIL_INFO ?? "",
+          unsubscribeUrl: `${process.env.BASE_URL}/desubscribirse/${token}`,
+          title:
+            "Mi portfolio ya está online y podés explorarlo cuando quieras.",
+          subtitle:
+            "Vas a encontrar proyectos, tecnologías que uso, formas de contacto y un poco más sobre mí. Ojalá te guste lo que estuve preparando todo este tiempo :)",
+        };
+
+        const { success, message, messageId } = await sendMail(
+          res[i].name,
+          res[i].email,
+          "Mi portfolio ya está online y podés explorarlo cuando quieras.",
+          "is-online",
+          body,
+          "Aviso de proyecto/portfolio ya online"
+        );
+
+        success ? interesados++ : interesados;
+        if (!success) {
+          Logger.error(
+            `Error al enviar notificación a ${res[i].email}: ${message}`,
+            this.serviceName
+          );
+          logger.error(
+            `Error al enviar notificación a ${res[i].email}: ${message}`,
+            {
+              service: this.serviceName,
+              stack: messageId,
+              metodo: "sendAllNotificationMail",
+            }
+          );
+        }
+
+        /* const data: EnviosCorreosDto = {
+          success,
+          message,
+          messageId,
+          name: res[i].name,
+          email: res[i].email,
+          metodo: "Aviso de proyecto/portfolio ya online",
+        };
+
+        const resp = await this.emailCorreoRepo.saveSendMail(data);
+
+        if (!resp) {
+          Logger.error(
+            `Error al guardar notificación a ${res[i].email}: ${message}`,
+            this.serviceName
+          );
+          logger.error(
+            `Error al guardar notificación a ${res[i].email}: ${message}`,
+            {
+              service: this.serviceName,
+              stack: messageId,
+              metodo: "sendAllNotificationMail",
+            }
+          );
+        }
+
+        Logger.log(
+          `Envio de notificaciones finalizado y guardado en la BD para ${res[i].name} <${res[i].email}>`,
+          this.serviceName
+        ); */
+      }
+
+      Logger.log(
+        `Notificaciones enviadas con exito a ${interesados} interesados`,
+        this.serviceName
+      );
+      return {
+        message: `Notificaciones enviadas con exito a ${interesados} interesados`,
+      };
+    } catch (err: any) {
+      if (process.env.NODE_ENV !== "production") {
+        Logger.error(err.stack, this.serviceName);
+      } else {
+        logger.error(`Error al guardar notificación: ${err.message}`, {
+          service: this.serviceName,
+          stack: err.stack,
+          metodo: "createNotification",
+        });
+        Logger.error(
+          `Error al guardar notificación: ${err.message}`,
+          this.serviceName
+        );
+      }
       throw err;
     }
   }

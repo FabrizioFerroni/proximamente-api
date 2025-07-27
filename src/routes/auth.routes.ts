@@ -23,6 +23,7 @@ import {
 import { adminAuth } from "../middleware/auth";
 import { refresh_token } from "../validations/auth.validation";
 import { decryptHeaderBodyMiddleware } from "../middleware/decryptHeaderBody.middleware";
+import { Logger } from "../common/logger";
 
 const router = Router();
 
@@ -66,4 +67,5 @@ router.post(
   refreshToken
 );
 
+Logger.log("Rutas auth cargadas", "AuthRoute");
 export default router;

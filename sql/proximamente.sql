@@ -3,13 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql
--- Tiempo de generación: 26-07-2025 a las 02:23:56
+-- Tiempo de generación: 27-07-2025 a las 12:53:41
 -- Versión del servidor: 9.0.1
 -- Versión de PHP: 8.2.24
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET time_zone = "-03:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -22,6 +22,25 @@ SET time_zone = "+00:00";
 --
 CREATE DATABASE IF NOT EXISTS `proximamente` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish2_ci;
 USE `proximamente`;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `envios_correos`
+--
+
+DROP TABLE IF EXISTS `envios_correos`;
+CREATE TABLE IF NOT EXISTS `envios_correos` (
+  `id` char(36) COLLATE utf8mb4_spanish2_ci NOT NULL,
+  `success` tinyint(1) NOT NULL,
+  `message` text COLLATE utf8mb4_spanish2_ci,
+  `message_id` text COLLATE utf8mb4_spanish2_ci,
+  `name` varchar(255) COLLATE utf8mb4_spanish2_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_spanish2_ci NOT NULL,
+  `method` text COLLATE utf8mb4_spanish2_ci NOT NULL,
+  `send_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 
 -- --------------------------------------------------------
 

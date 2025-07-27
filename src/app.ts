@@ -7,6 +7,7 @@ import notifyRoutes from "./routes/notify.routes";
 import adminRoutes from "./routes/admin.routes";
 import sessionRoutes from "./routes/session.routes";
 import userRoutes from "./routes/user.routes";
+import correosRoutes from "./routes/envio-correos.route";
 import { Logger } from "./common/logger";
 import { errorHandler } from "./middleware/errorHandler";
 import { logger } from "./utils/winston.logger";
@@ -72,6 +73,7 @@ app.use("/api", notifyRoutes);
 app.use("/api", sessionRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", userRoutes);
+app.use("/api", correosRoutes);
 
 app.use(errorHandler);
 

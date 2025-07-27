@@ -6,6 +6,7 @@ import {
   updatePasswordUser,
   updateInfoUser,
 } from "../validations/user.validation";
+import { Logger } from "../common/logger";
 
 const router = Router();
 
@@ -22,4 +23,5 @@ router.put(
   updatePassword
 );
 
+Logger.log("Rutas de usuario cargadas", "UsuarioRoute");
 export default router;

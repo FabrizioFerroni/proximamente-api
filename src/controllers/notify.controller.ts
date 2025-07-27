@@ -22,6 +22,7 @@ export const exportN8N = async (req: Request, res: Response) => {
 };
 
 export const sendAllNotificationN8N = async (req: Request, res: Response) => {
-  const data = await service.sendAllNotificationAuto();
+  // const data = await service.sendAllNotificationAuto();
+  const data = await service.sendAllNotificationMail();
   res.json(data);
 };

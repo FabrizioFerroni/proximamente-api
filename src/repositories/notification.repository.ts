@@ -4,7 +4,6 @@ import { RowDataPacket } from "mysql2";
 import { NotificationReportDto } from "../dtos/report-response-notify.dto";
 import { NotificationModel } from "../model/notification.model";
 import SQL from "sql-template-strings";
-import dayjs from "../helpers/time";
 import { UpdateNotificationDto } from "../dtos/update-notification.dto";
 import { Logger } from "../common/logger";
 
@@ -50,7 +49,8 @@ export class NotificationRepository {
             n.created_at 
         FROM notificaciones AS n 
         WHERE n.status = true
-        ORDER BY n.created_at DESC`;
+        ORDER BY n.created_at DESC
+        LIMIT 3`;
 
     const [rows] = await pool.query<RowDataPacket[]>(query);
     return rows as NotificationModel[];
