@@ -77,27 +77,18 @@ jobs:
         run: |
           cat <<EOF > payload.json
           {
-            "owner_user_id": ${{ env.owner_id }},
             "domain_names": ["${{ secrets.DNS_NAME }}"],
+            "forward_scheme": "http",
             "forward_host": "${{ secrets.FORWARD_HOST }}",
             "forward_port": ${{ secrets.FORWARD_PORT }},
             "access_list_id": 0,
             "certificate_id": ${{ secrets.CERTIFICATE_ID }},
             "ssl_forced": true,
-            "caching_enabled": true,
-            "block_exploits": true,
-            "advanced_config": "",
             "meta": {
               "letsencrypt_agree": false,
               "dns_challenge": false
             },
-            "allow_websocket_upgrade": true,
-            "http2_support": true,
-            "forward_scheme": "http",
-            "enabled": true,
-            "locations": [],
-            "hsts_enabled": true,
-            "hsts_subdomains": false
+            "locations": []
           }
           EOF
           curl -s -X POST "${{ secrets.NPM_URL }}/api/nginx/proxy-hosts" \
