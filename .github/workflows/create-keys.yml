@@ -59,8 +59,8 @@ jobs:
             # Siempre asegurarse de que el .env esté correcto (limpiar y reescribir)
             grep -v -e '^PASSWORD_PRIVATE_KEY=' -e '^PATH_PRIVATE_KEY=' -e '^PATH_PUBLIC_KEY=' "$ENV_FILE" > "$ENV_FILE.tmp" || true
             echo "PASSWORD_PRIVATE_KEY=$PASSPHRASE" >> "$ENV_FILE.tmp"
-            echo "PATH_PRIVATE_KEY=/keys/private.pem" >> "$ENV_FILE.tmp"
-            echo "PATH_PUBLIC_KEY=/keys/public.pem" >> "$ENV_FILE.tmp"
+            echo "PATH_PRIVATE_KEY=./keys/private.pem" >> "$ENV_FILE.tmp"
+            echo "PATH_PUBLIC_KEY=./keys/public.pem" >> "$ENV_FILE.tmp"
             mv "$ENV_FILE.tmp" "$ENV_FILE"
 
             # Generar claves
