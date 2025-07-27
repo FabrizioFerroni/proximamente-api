@@ -1,0 +1,127 @@
+name: Deploy to Portainer
+
+on:
+  workflow_run:
+    workflows: ["Build Docker Image"]
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
+    name: Deploy to portainer
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+      fail-fast: true
+
+    env:
+      GITHUB_REF: ${{ github.ref }}
+      DOCKER_REGISTRY: docker.io
+      DOCKER_IMAGE: ${{ secrets.IMAGE_NAME }}
+      DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKER_IMAGE_FINAL: "fabriziodevar/api-proximamente:latest"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Creating envs
+        run: |
+          echo "IMAGE_TAG=sha-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_URI=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_USER }}/${{ env.DOCKER_IMAGE }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_FINAL=${{ env.DOCKER_USER }}/${{ env.DOCKER_IMAGE }}:latest" >> $GITHUB_ENV
+
+      - name: Set up environment variables
+        run: |
+          echo "APP=${{ secrets.APP }}" >> .env
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
+          echo "PORT=${{ secrets.PORT }}" >> .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+          echo "DOTENV_LOG=${{ secrets.DOTENV_LOG }}" >> .env
+          echo "DOTENV_KEY=${{ secrets.DOTENV_KEY }}" >> .env
+          echo "LOG_LEVEL=${{ secrets.LOG_LEVEL }}" >> .env
+          echo "JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}" >> .env
+          echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> .env
+          echo "JWT_ACCESS_EXPIRATION=${{ secrets.JWT_ACCESS_EXPIRATION }}" >> .env
+          echo "JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}" >> .env
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
+          echo "TZ_BD=${{ secrets.TZ_BD }}" >> .env
+          echo "TZ=${{ secrets.TZ }}" >> .env
+          echo "TRUST_PROXY=${{ secrets.TRUST_PROXY }}" >> .env
+          echo "IP_API_KEY=${{ secrets.IP_API_KEY }}" >> .env
+          echo "PASSWORD_PRIVATE_KEY=${{ secrets.PASSWORD_PRIVATE_KEY }}" >> .env
+          echo "PATH_PRIVATE_KEY=${{ secrets.PATH_PRIVATE_KEY }}" >> .env
+          echo "HOST_FRONT=${{ secrets.HOST_FRONT }}" >> .env
+          echo "HOST_FRONT_EMAIL=${{ secrets.HOST_FRONT_EMAIL }}" >> .env
+          echo "HOST_MAIL=${{ secrets.HOST_MAIL }}" >> .env
+          echo "PORT_MAIL=${{ secrets.PORT_MAIL }}" >> .env
+          echo "NAME_MAIL=${{ secrets.NAME_MAIL }}" >> .env
+          echo "USER_MAIL=${{ secrets.USER_MAIL }}" >> .env
+          echo "PASS_MAIL=${{ secrets.PASS_MAIL }}" >> .env
+          echo "SECURE_MAIL=${{ secrets.SECURE_MAIL }}" >> .env
+          echo "CIPHERS_MAIL=${{ secrets.CIPHERS_MAIL }}" >> .env
+          echo "MAIL_INFO=${{ secrets.MAIL_INFO }}" >> .env
+          echo "MAIL_CONTACT=${{ secrets.MAIL_CONTACT }}" >> .env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          echo "GITHUB_URL=${{ secrets.HG_URL }}" >> .env
+          echo "LINKEDIN_URL=${{ secrets.LINKEDIN_URL }}" >> .env
+          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22.17.0"
+
+      - name: Create update-image.js
+        run: |
+          echo '
+          const yaml = require("js-yaml");
+          const fs = require("fs");
+
+          const dockerComposeFile = "./docker/docker-compose.dev.yml";
+          const newImage = process.env.DOCKER_IMAGE_FINAL;
+
+          try {
+              const doc = yaml.load(fs.readFileSync(dockerComposeFile, "utf8"));
+              doc.services["api-proximamente"].image = newImage;
+              fs.writeFileSync(dockerComposeFile, yaml.dump(doc));
+              console.log("Successfully updated image in docker-compose.dev.yml");
+            } catch (e) {
+                console.error("Error:", e);
+                process.exit(1);
+            }
+          ' > update-image.js
+
+      - name: Install dependencies
+        run: npm install js-yaml
+
+      - name: Change image in docker-compose
+        run: node update-image.js
+
+      - name: Show docker-compose
+        run: cat ./docker/docker-compose.dev.yml
+
+      - name: Save ENV Status
+        run: echo "Variables seteadas" >> $GITHUB_STEP_SUMMARY
+
+      - name: Deploy stack to Portainer
+        uses: cssnr/portainer-stack-deploy-action@v1
+        with:
+          url: ${{ secrets.PORTAINER_HOST }}
+          token: ${{ secrets.PORTAINER_ACCES_TOKEN }}
+          endpoint: 3
+          standalone: true
+          name: ${{ secrets.IMAGE_NAME }}
+          file: ./docker/docker-compose.dev.yml
+          type: file
+          prune: true
+          pull: true
+          tlsskip: false
+          env_file: .env
+
+      - name: Save Deployment Status
+        run: echo "DEPLOY_STATUS=success" >> $GITHUB_ENV
