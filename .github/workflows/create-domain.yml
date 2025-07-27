@@ -61,8 +61,9 @@ jobs:
             FORWARD_HOST=$(echo "$HOST" | jq -r '.forward_host')
             FORWARD_PORT=$(echo "$HOST" | jq -r '.forward_port')
             CERT_ID=$(echo "$HOST" | jq -r '.certificate_id')
+            ENABLED=$(echo "$HOST" | jq -r '.enabled')
 
-            if [[ "$FORWARD_HOST" == "${{ secrets.FORWARD_HOST }}" && "$FORWARD_PORT" == "${{ secrets.FORWARD_PORT }}" && "$CERT_ID" == "${{ secrets.CERTIFICATE_ID }}" ]]; then
+            if [[ "$FORWARD_HOST" == "${{ secrets.FORWARD_HOST }}" && "$FORWARD_PORT" == "${{ secrets.FORWARD_PORT }}" && "$CERT_ID" == "${{ secrets.CERTIFICATE_ID }}" && "$ENABLED" == "${{ secrets.ENABLED }}" ]]; then
               echo "needs_update=false" >> $GITHUB_ENV
             else
               echo "needs_update=true" >> $GITHUB_ENV
@@ -74,11 +75,9 @@ jobs:
       - name: Crear el dominio si no existe
         if: env.exists == 'false'
         run: |
-          curl -s -X POST "${{ secrets.NPM_URL }}/api/nginx/proxy-hosts" \
-          -H "Authorization: Bearer ${{ env.token }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "owner_user_id": '"${{ env.owner_id }}"',
+          cat <<EOF > payload.json
+          {
+            "owner_user_id": ${{ env.owner_id }},
             "domain_names": ["${{ secrets.DNS_NAME }}"],
             "forward_host": "${{ secrets.FORWARD_HOST }}",
             "forward_port": ${{ secrets.FORWARD_PORT }},
@@ -90,9 +89,7 @@ jobs:
             "advanced_config": "",
             "meta": {
               "letsencrypt_agree": false,
-              "dns_challenge": false,
-              "nginx_online": true,
-              "nginx_err": null
+              "dns_challenge": false
             },
             "allow_websocket_upgrade": true,
             "http2_support": true,
@@ -101,7 +98,12 @@ jobs:
             "locations": [],
             "hsts_enabled": true,
             "hsts_subdomains": false
-          }'
+          }
+          EOF
+          curl -s -X POST "${{ secrets.NPM_URL }}/api/nginx/proxy-hosts" \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json" \
+          --data-binary @payload.json
 
       - name: Actualizar el dominio si ya existe y cambió la config
         if: env.exists == 'true' && env.needs_update == 'true'
@@ -109,31 +111,7 @@ jobs:
           curl -s -X PUT "${{ secrets.NPM_URL }}/api/nginx/proxy-hosts/${{ env.host_id }}" \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
-          -d '{
-            "owner_user_id": '"${{ env.owner_id }}"',
-            "domain_names": ["${{ secrets.DNS_NAME }}"],
-            "forward_host": "${{ secrets.FORWARD_HOST }}",
-            "forward_port": ${{ secrets.FORWARD_PORT }},
-            "access_list_id": 0,
-            "certificate_id": ${{ secrets.CERTIFICATE_ID }},
-            "ssl_forced": true,
-            "caching_enabled": true,
-            "block_exploits": true,
-            "advanced_config": "",
-            "meta": {
-              "letsencrypt_agree": false,
-              "dns_challenge": false,
-              "nginx_online": true,
-              "nginx_err": null
-            },
-            "allow_websocket_upgrade": true,
-            "http2_support": true,
-            "forward_scheme": "http",
-            "enabled": true,
-            "locations": [],
-            "hsts_enabled": true,
-            "hsts_subdomains": false
-          }'
+          --data-binary @payload.json
 
       - name: Confirmar acción
         run: |
