@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cross-env TZ=America/Argentina/Cordoba NODE_ENV=production node dist/app.js",
     "dev": "cross-env TZ=America/Argentina/Cordoba ts-node-dev --inspect --respawn --pretty --transpile-only src/app.ts",
-    "build": "tsc"
+    "build": "tsc && npm run copy-static",
+    "copy-static": "cpx \"src/mail/page/**/*\" dist/mail/page"
   },
   "keywords": [],
   "author": "",
@@ -64,6 +65,7 @@
     "@types/qrcode": "^1.5.5",
     "@types/speakeasy": "^2.0.10",
     "@types/winston": "^2.4.4",
+    "cpx": "^1.5.0",
     "cross-env": "^7.0.3",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
