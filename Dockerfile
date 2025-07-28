@@ -26,14 +26,18 @@ WORKDIR /usr/src/app
 
 # Copiar solo lo necesario desde el build
 COPY --from=builder /usr/src/app/dist ./
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-#COPY --from=builder /usr/src/app/package*.json ./
+COPY --from=builder /usr/src/app/package*.json ./
+
+# Instalar dependencias
+RUN npm clean-install --omit=dev
 
 # mkdir keys
 RUN mkdir keys
 
 # Exponer puerto
 EXPOSE 3000
+
+RUN rm package*.json
 
 # Comando de inicio
 CMD ["node", "app.js"]
