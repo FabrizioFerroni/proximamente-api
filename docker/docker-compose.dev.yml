@@ -58,11 +58,11 @@ services:
     volumes:
       - /home/ubuntu/certs/proximamente/keys:/usr/src/app/keys
     networks:
-      - proxy
+      - fullstack
       - dbs
 
 networks:
-  proxy:
+  fullstack:
     external: true
   dbs:
     external: true
