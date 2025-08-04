@@ -33,7 +33,7 @@ export const sendMail = async (
   try {
     // Leer archivo HTML con fs/promises
     const html = await fs.readFile(
-      process.cwd() + `/src/mail/page/${plantilla}.html`,
+      process.cwd() + `/mail/page/${plantilla}.html`,
       "utf-8"
     );
 
